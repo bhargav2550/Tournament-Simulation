@@ -1,5 +1,5 @@
-=import random
-
+import random
+# creating a player class which has the required attributes.
 class Player:
     def __init__(self, name, batting, bowling, fielding, running, experience):
         self.name = name
@@ -36,16 +36,9 @@ class Teams:
         if len(self.players) == 0:
             return None
 
-        bowler = None
-        for player in self.players:
-            if player.bowling > 0.5:
-                bowler = player
-                break
-
-        if bowler:
-            self.players.remove(bowler)
+        bowler = self.players.pop()
+        self.players.append(bowler)
         return bowler
-
 
 class Field:
     def __init__(self, field_size, fan_ratio, pitch_conditions, home_advantage):
@@ -54,7 +47,7 @@ class Field:
         self.pitch_conditions = pitch_conditions
         self.home_advantage = home_advantage
 
-
+# It will do umpiring. It may be Out or not out and handle the wickets 
 class Umpire:
     def __init__(self, field):
         self.field = field
@@ -92,7 +85,7 @@ class Umpire:
         if decision>1:
             self.score+=1 
 
-
+# It will do commentary by printing batsman and bowler names and score
 class Commentator:
     def __init__(self):
         pass
@@ -127,14 +120,12 @@ class Match:
     def play_innings(self, batting_team, bowling_team):
         print(f"{batting_team.team_name} is batting...")
         batsman = batting_team.send_next_player()
-        while batsman:
+        while batsman and self.umpire.wickets < 10:
             bowler = bowling_team.choose_bowler()
             for ball in range(6):
                 outcome = self.umpire.predict_outcome(batsman, bowler)
                 if outcome == "Out":
                     self.umpire.handle_wicket()
-                    if self.umpire.wickets == 10:
-                        self.end_match()
                     self.commentator.provide_commentary(ball, self.umpire.overs, batsman, bowler, self.umpire)
                     print(f"{batsman} is out!")
                     break
@@ -145,10 +136,11 @@ class Match:
                     print(f"{batsman} scores {runs} run(s)!")
             self.umpire.handle_over()
             batsman = batting_team.send_next_player()
-
+    #end the innings if wickets fall down to 10 or number of overs is completed.
     def end_match(self):
         print("Match ended!")
         print(f"Final Score: {self.umpire.score}/{self.umpire.wickets}")
+
 
 
 
